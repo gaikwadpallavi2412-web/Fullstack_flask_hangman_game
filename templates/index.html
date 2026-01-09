@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Cowboy Hangman UI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Optional Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;600&family=Rock+Salt&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --sand: #f6e2c3;
+            --sand-dark: #e3c9a2;
+            --brown: #7c4a2b;
+            --brown-dark: #5a341c;
+            --accent-blue: #61b4ff;
+            --text-main: #3f2a19;
+        }
+
+        * {
+            /* box-sizing: border-box;*/
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            background: radial-gradient(circle at top, #fff7e8 0, #f3d9aa 60%, #ddaa6b 100%);
+            font-family: "Cabin", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--text-main);
+        }
+
+        .app-frame {
+            background: var(--sand);
+            border-radius: 32px;
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.25);
+            max-width: 1100px;
+            width: 100%;
+            padding: 0px 0px 0px;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #8b5b2e;
+        }
+
+        .game-layout {
+            height: 630px;
+            width: 100%;
+            margin-top: 0;
+            display: flex;
+            overflow: hidden;
+            /* hide anything that sticks out */
+            border-radius: 32px;
+
+        }
+
+        .game-layout img {
+            height: 630px;
+            width: 100%;
+            object-fit: cover;
+            /* 🔥 fill the area, no empty sides */
+            border-radius: 32px;
+        }
+       /* RESPONSIVE */
+        @media (max-width: 960px) {
+            .game-layout {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        /* ✅ Start Button Overlay */
+        .start-btn {
+            position: absolute;
+            bottom: 80px;
+            /* adjust as needed */
+            left: 50%;
+            transform: translateX(-50%);
+
+            padding: 14px 40px;
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+
+            background: linear-gradient(180deg, #7c4a2b, #3f2a19);
+            border-radius: 12px;
+
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+        }
+
+        /* ✅ Hover Effect */
+        .start-btn:hover {
+            transform: translateX(-50%) scale(1.08);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ✅ Click Effect */
+        .start-btn:active {
+            transform: translateX(-50%) scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-frame">
+        <div class="game-layout">
+            <!-- LEFT: Scene -->
+            <img src="static/images/index.png">
+            <a href="/home" class="start-btn">PLAY</a>
+            <!-- RIGHT: Game panel -->
+        </div>
+    </div>
+</body>
+</html>

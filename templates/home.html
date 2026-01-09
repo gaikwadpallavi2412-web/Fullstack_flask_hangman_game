@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Cowboy Hangman UI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Optional Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;600&family=Rock+Salt&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --sand: #f6e2c3;
+      --sand-dark: #e3c9a2;
+      --brown: #7c4a2b;
+      --brown-dark: #5a341c;
+      --accent-blue: #61b4ff;
+      --text-main: #3f2a19;
+    }
+
+    * {
+      /* box-sizing: border-box;*/
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      background: radial-gradient(circle at top, #fff7e8 0, #f3d9aa 60%, #ddaa6b 100%);
+      font-family: "Cabin", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text-main);
+    }
+
+    .app-frame {
+      background: var(--sand);
+      border-radius: 32px;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.25);
+      max-width: 1100px;
+      width: 100%;
+      padding: 18px 0px 0px;
+      position: relative;
+      overflow: hidden;
+      border: 4px solid #8b5b2e;
+    }
+
+    /* Top nav icons */
+    .top-bar {
+      display: flex;
+      justify-content: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    /* Wooden title sign */
+    .wooden-sign {
+      margin-left: auto;
+      margin-right: 400px;
+      width: 260px;
+      padding: 16px 24px 18px;
+      background: linear-gradient(135deg, #a46d3a, #85512c);
+      border-radius: 18px;
+      box-shadow:
+        0 6px 0 rgba(90, 52, 24, 0.9),
+        0 12px 22px rgba(0, 0, 0, 0.35);
+      text-align: center;
+      color: #fef5e6;
+      font-family: "Rock Salt", cursive;
+      font-size: 26px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      position: relative;
+    }
+
+    .wooden-sign::before,
+    .wooden-sign::after {
+      content: "";
+      position: absolute;
+      top: -28px;
+      width: 24px;
+      height: 28px;
+      border-radius: 10px;
+      background: #b98a51;
+      box-shadow: 0 0 0 4px #8b5b2e;
+    }
+
+    .rope {
+      position: absolute;
+      top: -70px;
+      width: 2px;
+      height: 70px;
+      background: #8b5b2e;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* Layout for scene + panel */
+    .game-layout {
+      display: grid;
+      grid-template-columns: 1.05fr 1.15fr;
+      gap: 1px;
+      margin-top: 6px;
+      align-items: stretch;
+    }
+
+    .incorrect-card {
+      position: absolute;
+      right: 15px;
+      bottom: 16px;
+      padding: 8px 14px;
+      background: #fef6df;
+      border-radius: 50%;
+      border: 5px solid #d1b999;
+      box-shadow: 0 3px 4px rgba(0, 0, 0, 0.18);
+      font-size: 15px;
+      line-height: 1.4;
+      width: 120px;
+      height: 120px;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .incorrect-card strong {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    /* RIGHT: game panel */
+    .panel {
+      border-radius: 8px;
+      background: #fdf5e7;
+      border: 0px solid rgba(0, 0, 0, 0.00);
+      box-shadow: inset 0 0 0 0px rgba(255, 255, 255, 0.6);
+      padding: 16px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .hint-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #5fa4f8;
+      color: #e7f0f7;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .hint-badge::before {
+      content: "💡";
+    }
+
+    .hint-text {
+      margin-top: 4px;
+      font-size: 14px;
+      max-width: 100%;
+      color: #5b4331;
+    }
+
+    .slots {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .slot {
+      width: 40px;
+      height: 48px;
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      font-weight: 600;
+      position: relative;
+    }
+
+    .slot::after {
+      content: "";
+      position: absolute;
+      bottom: 6px;
+      left: 8px;
+      right: 8px;
+      height: 2px;
+      background: #3d2e23;
+      opacity: 0.4;
+    }
+
+    .slot.empty {
+      color: transparent;
+    }
+
+    .alphabet {
+      margin-top: 12px;
+      font-size: 18px;
+      letter-spacing: 0.45em;
+      text-align: left;
+    }
+
+    .alphabet span.guessed {
+      color: #c34545;
+      text-decoration: underline;
+    }
+
+    .scene {
+      width: 100%;
+      max-width: 800px;
+      /* control max size */
+    }
+
+    .scene img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: 0px solid #444;
+      border-radius: 8px;
+    }
+
+    .keyboard {
+      display: grid;
+      grid-template-columns: repeat(7, 60px);
+      gap: 10px;
+      padding: 15px;
+      background-color: #fff8dc;
+      border: 0px solid #8b4513;
+      border-radius: 12px;
+      /*box-shadow: 0 0 10px rgba(0,0,0,0.2);*/
+    }
+
+    .key {
+      width: 50px;
+      height: 50px;
+      background-color: #deb887;
+      /* warm brown */
+      border: 0px solid #8b4513;
+      /* darker brown */
+      border-radius: 50%;
+      /* makes it circular */
+      font-size: 20px;
+      font-weight: bold;
+      color: #4b2e1e;
+      text-align: center;
+      line-height: 60px;
+      /* vertically center text */
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      /* activate flexbox */
+      align-items: center;
+      /* vertical centering */
+      justify-content: center;
+      /* horizontal centering */
+
+    }
+
+    .key:hover {
+      background-color: #f0c987;
+      transform: scale(1.05);
+    }
+
+
+    .key.used {
+      background-color: #deb887;
+      color: #4b2e1e;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .key.red {
+      border-bottom: 4px solid red;
+    }
+
+    .key.green {
+      border-bottom: 4px solid rgb(7, 114, 36);
+    }
+
+    .bottom_line {
+      font-family: "Rock Salt", cursive;
+      font-weight: bold;
+      font-size: 16px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      position: relative;
+      padding-left: 15px;
+      padding-top: 10px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 960px) {
+      .game-layout {
+        grid-template-columns: 1fr;
+      }
+
+    }
+
+    .home-icon {
+      position: fixed;
+      /* stays in the corner */
+      top: 40px;
+      left: 400px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      /* touch-friendly size */
+      height: 0px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.85);
+      color: #245a87;
+      /* icon color via currentColor */
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      text-decoration: none;
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+    }
+
+    .home-icon:hover {
+      background: #ffffff;
+      color: #000;
+    }
+
+    .home-icon:focus {
+      outline: 2px solid #4c9ffe;
+      /* visible focus for accessibility */
+      outline-offset: 2px;
+    }
+
+    /* Optional: adapt for smaller screens */
+    @media (max-width: 480px) {
+      .home-icon {
+        top: 12px;
+        left: 12px;
+        width: 36px;
+        height: 36px;
+      }
+
+      .home-icon svg {
+        width: 22px;
+        height: 22px;
+      }
+    }
+
+    #home-btn {
+      position: absolute;
+      /* use fixed if you want it to stay on screen while scrolling */
+      top: 10px;
+      left: 10px;
+      width: 60px;
+      /* adjust size as needed */
+      height: 60px;
+      cursor: pointer;
+    }
+
+    #top-buttons {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      display: flex;
+      /* ✅ makes them side by side */
+      gap: 12px;
+      /* ✅ spacing between icons */
+      z-index: 999;
+
+    }
+
+    #top-buttons img {
+      width: 60px;
+      height: 60px;
+      cursor: pointer;
+    }
+
+    #top-buttons img:hover {
+      transform: scale(1.12);
+      box-shadow: 0 0 18px rgba(0, 170, 255, 0.9);
+      filter: brightness(1.15);
+    }
+
+    #score-star {
+      position: absolute;
+      top: 10px;
+      right: 30px;
+      /* change to left if needed */
+      width: 200px;
+      /* ✅ BIG SIZE */
+      height: 140px;
+
+      background: radial-gradient(circle at 30% 30%, #ffd700, #ffd700);
+
+      clip-path: polygon(50% 0%,
+          61% 35%,
+          98% 35%,
+          68% 57%,
+          79% 91%,
+          50% 70%,
+          21% 91%,
+          32% 57%,
+          2% 35%,
+          39% 35%);
+
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-weight: bold;
+      font-size: 36px;
+      /* ✅ BIG NUMBER */
+      color: #85512c;
+      text-shadow: 0 2px 2px rgba(255, 255, 255, 0.6);
+
+      box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.5),
+        inset 0 3px 8px rgba(255, 255, 255, 0.4);
+
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* ✅ Hover Effect */
+    #score-star:hover {
+      transform: scale(1.08);
+      box-shadow:
+        0 14px 30px rgba(0, 0, 0, 0.6),
+        inset 0 3px 8px rgba(255, 255, 255, 0.4);
+    }
+
+    /* ✅ Click Effect */
+    #score-star:active {
+      transform: scale(0.94);
+    }
+
+    #score-star span {
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-frame">
+    <div class="wooden-sign">
+      <div class="rope"></div>
+      HANGMAN
+    </div>
+
+    <div class="game-layout">
+      <!-- LEFT: Scene -->
+      <section class="scene">
+        <div id="top-buttons">
+          <a href="/"><img src="static/images/home_icon.png" alt="Home"></a>
+          <a href="/"><img src="static/images/reset_icon.png" alt="Reset"></a>
+          <a href="/"><img src="static/images/exit_icon.png" alt="Exit"></a>
+        </div>
+        <!--
+        <div id="score-star" >
+          <span id="score-value" >60</span>
+        </div>
+       -->
+        {% if (b_list.count("-")==0)%}
+        <div id="score-star" >
+          <span id="score-value" >60</span>
+        </div>
+        <img src="static/images/Dancing_Hangman_1024x1024.png">
+        <audio id="win-sound" src="{{ url_for('static', filename='music/victory.mp3') }}" preload="auto">
+        </audio>
+        <script>
+          // Try to play as soon as this block is rendered
+          const winSound = document.getElementById('win-sound');
+          if (winSound) {
+            winSound.currentTime = 0;
+            winSound.play().catch(err => {
+              console.log("Autoplay blocked:", err);
+            });
+          }
+        </script>
+        {% elif (b_list.count("-")!=0) %}
+        {% if lives ==6 %}
+        <img src="static/images/Initial.png">
+        {% elif lives ==5 %}
+        <img src="static/images/Head_1024x1024.png">
+        {% elif lives ==4 %}
+        <img src="static/images/Head_1Hand_1024x1024.png">
+        {% elif lives ==3 %}
+        <img src="static/images/Head_2Hand_1024x1024.png">
+        {% elif lives ==2 %}
+        <img src="static/images/Head_Hand_Body_1024x1024.png">
+        {% elif lives ==1 %}
+        <img src="static/images/Head_Hand_Body_1Leg_1024x1024.png">
+        {% elif lives ==0 %}
+        <div id="score-star" >
+          <span id="score-value" >0</span>
+        </div>
+        <img src="static/images/Sad_Hangman_1024x1024.png">
+        <audio id="loss-sound" src="{{ url_for('static', filename='music/loss.mp3') }}" preload="auto">
+        </audio>
+        <script>
+          // Try to play as soon as this block is rendered
+          const lossSound = document.getElementById('loss-sound');
+          if (lossSound) {
+            lossSound.currentTime = 0;
+            lossSound.play().catch(err => {
+              console.log("Autoplay blocked:", err);
+            });
+          }
+        </script>
+        {% endif %}
+        {% endif %}
+
+      </section>
+
+      <!-- RIGHT: Game panel -->
+      <section class="panel">
+        <div>
+          <span class="hint-badge">Hint</span><br>
+          <br>
+          <p class="hint-text">
+            {{Hint}}
+          </p>
+        </div>
+
+        <div class="slots">
+          {% for i in range(b_list|length) %}
+          {% if b_list[i] == '-'%}
+          <div class="slot empty"></div>
+          {% else %}
+          <div class="slot">{{b_list[i]}}</div>
+          {% endif %}
+          {% endfor %}
+        </div>
+
+        <form method="post" action="/update">
+          {% set letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
+          <div class="keyboard">
+            {% for ch in letters %}
+            <button name="action" value="{{ ch }}" class="key
+             {% if ch in b_list %} green used
+             {% elif ch in incorrect_guess %} red used
+             {% endif %}">
+              {{ ch }}
+            </button>
+            {% endfor %}
+          </div>
+
+        </form>
+        <div class="bottom_line">Guess the correct word</div>
+
+        <div class="incorrect-card">
+          <strong>Lives Remaining :</strong>
+          {{lives}}/6
+        </div>
+      </section>
+    </div>
+
+  </div>
+</body>
+
+</html>
