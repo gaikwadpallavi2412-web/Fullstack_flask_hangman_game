@@ -21,6 +21,12 @@ MY_HANGMAN/
 ├── templates/
 ├── main.py
 
+## Demo Documentation
+
+A detailed demo of the Hangman game is available here:
+
+📄 [Download Demo Document](Demo.docx)
+
 
 ## How to Run Locally
 ```bash
